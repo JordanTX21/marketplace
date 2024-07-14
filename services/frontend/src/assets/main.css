@@ -1,0 +1,33 @@
+@import './base.css';
+@import './fonts.css';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .btn-primary {
+        @apply bg-primary-100 text-neutral-00 disabled:bg-primary-60
+    }
+    .btn-secondary {
+        @apply bg-neutral-10 text-neutral-80 disabled:bg-neutral-05 disabled:border disabled:border-neutral-10
+    }
+    .btn-tertiary {
+        @apply bg-neutral-00 text-neutral-80 border border-neutral-10 disabled:bg-neutral-05 disabled:border disabled:border-neutral-10
+    }
+}
+
+*{
+    font-family: 'HeyWow','sans-serif';
+}
+
+::-webkit-scrollbar{
+    width: 4px;
+    height: 4px;
+    background-color: #F5F5F5;
+}
+::-webkit-scrollbar-track{
+    background-color: #E7E7E8;
+}
+::-webkit-scrollbar-thumb{
+    background-color: #bfbfbf;
+}

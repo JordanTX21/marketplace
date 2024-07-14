@@ -1,0 +1,48 @@
+@font-face {
+    font-family: 'HeyWow';
+    font-weight: 400;
+    font-style: normal;
+    src: url('@/assets/fonts/heywow/HeyWowRegular.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'HeyWow';
+    font-weight: 300;
+    font-style: normal;
+    src: url('@/assets/fonts/heywow/HeyWowLight.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'HeyWow';
+    font-weight: 500;
+    font-style: normal;
+    src: url('@/assets/fonts/heywow/HeyWowMedium.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'HeyWow';
+    font-weight: 600;
+    font-style: normal;
+    src: url('@/assets/fonts/heywow/HeyWowSemiBold.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'HeyWow';
+    font-weight: 700;
+    font-style: normal;
+    src: url('@/assets/fonts/heywow/HeyWowBold.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'HeyWow';
+    font-weight: 800;
+    font-style: normal;
+    src: url('@/assets/fonts/heywow/HeyWowExtraBold.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'HeyWow';
+    font-weight: 900;
+    font-style: normal;
+    src: url('@/assets/fonts/heywow/HeyWowHeavy.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'HeyWow';
+    font-weight: 400;
+    font-style: italic;
+    src: url('@/assets/fonts/heywow/HeyWowBook.ttf') format('truetype');
+  }

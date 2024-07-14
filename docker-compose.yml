@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+
+  backend:
+    build: ./services/backend
+    ports:
+      - 5000:5000
+    volumes:
+      - ./services/backend:/app
+    command: uvicorn src.main:app --reload --host 0.0.0.0 --port 5000
+    depends_on:
+      - frontend-builder
+
+  frontend:
+    build: ./services/frontend
+    volumes:
+      - './services/frontend:/app'
+      - '/app/node_modules'
+    ports:
+      - 8080:8080
+      
+  frontend-builder:
+    build: ./services/frontend
+    command: npm run build
+    volumes:
+      - './services/frontend:/app'
+      - '/app/node_modules'
+    environment:
+      - NODE_ENV=production
