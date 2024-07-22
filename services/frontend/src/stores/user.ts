@@ -14,7 +14,18 @@ class UserSingleton {
     private static instance: UserSingleton;
 
     // Propiedades de ejemplo
-    private data: UserData | null = null;
+    private data: UserData = {
+        id: 0,
+        name: "",
+        email: "",
+        password: "",
+        photo: null,
+        rol: "",
+        description: null,
+        created_at: "",
+        updated_at: null,
+        status: false,
+    };
 
     // Constructor privado para evitar instanciación externa
     private constructor() { }
@@ -33,8 +44,8 @@ class UserSingleton {
     }
 
     // Método de ejemplo
-    public getData(): UserData | null {
-        const data = JSON.parse(localStorage.getItem('user_data') || '');
+    public getData(): UserData {
+        const data = JSON.parse(localStorage.getItem('user_data'));
         if(data) this.data = data
         return this.data;
     }

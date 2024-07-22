@@ -18,17 +18,11 @@ const menu = ref([
         route: 'orders',
         active: true
     },
-    {
-        name: 'Messages',
-        route: 'messages',
-        active: false
-    }
 ])
 
 function toggleActive(item:any){
     menu.value.forEach(bt => bt.active = false)
     item.active = true
-    router.push({name:item.route})
 }
 
 </script>

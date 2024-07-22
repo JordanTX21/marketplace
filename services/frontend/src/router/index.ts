@@ -89,7 +89,7 @@ router.beforeEach((to, from, next) => {
 
   const _userSingleton = UserSingleton.getInstance();
   const user = _userSingleton.getData()
-  if (to.meta.requiresAuth && user==null) {
+  if (to.meta.requiresAuth && (user===null || user.id === 0)) {
     // Si la ruta requiere autenticación y el usuario no está autenticado, redirige al login
     next({ name: 'login' }); // Cambia 'login' por el nombre de tu ruta de login
   } else {

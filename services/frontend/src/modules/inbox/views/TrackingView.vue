@@ -8,17 +8,17 @@
                 Order tracking
             </div>
         </div>
-        <div class="">
-            <div class="flex flex-col gap-y-6 py-6">
+        <div class="flex justify-center">
+            <div class="flex flex-col gap-y-6 py-6" v-for="(product,index) in order.products">
                 <div class="flex justify-center">
-                    <img class="w-24 h-32 rounded-xl object-cover"
-                        src="https://i.pinimg.com/originals/07/37/1a/07371a0783400a01c20701d139857643.png"
-                        alt="Bershka Mom Jeans">
+                    <img class="h-32 rounded-xl object-cover"
+                        :src="product.image"
+                        :alt="product.name">
                 </div>
                 <div class="flex justify-center gap-1">
                     <div>
-                        <div class="text-neutral-90 text-lg truncate">Bershka Mom Jeans</div>
-                        <div class="text-neutral-60 text-sm">26 - S | Blue | ID:0706502</div>
+                        <div class="text-neutral-90 text-lg truncate">{{ product.name }}</div>
+                        <div class="text-neutral-60 text-sm">ID:{{ product.code }}</div>
                     </div>
                 </div>
             </div>
@@ -38,53 +38,45 @@
                 </div>
             </div>
             <div class="px-6">
-                <div class="text-neutral-90 font-semibold text-xl">Your package is on it’s way</div>
-                <div class="text-base text-neutral-70">Arrival estimate: April 15</div>
+                <div class="text-neutral-90 font-semibold text-xl">Tu paquete se encuentra {{ parseStates(order.states) }}</div>
+                <div class="text-base text-neutral-70">Llega aproximadamente: April 15</div>
             </div>
             <div class="pt-3 pb-4 px-6">
-                <div class="py-2">
-                    <div class="text-base text-neutral-90">Your package is near!</div>
-                    <div class="text-sm text-neutral-60">April 15, 12:05</div>
-                </div>
-                <div class="py-2">
-                    <div class="text-base text-neutral-90">Your package is near!</div>
-                    <div class="text-sm text-neutral-60">April 15, 12:05</div>
-                </div>
-                <div class="py-2">
-                    <div class="text-base text-neutral-90">Your package is near!</div>
-                    <div class="text-sm text-neutral-60">April 15, 12:05</div>
+                <div class="py-2" v-for="(state, index) in order.states">
+                    <div class="text-base text-neutral-90">{{ parseState(state).toUpperCase() }}</div>
+                    <div class="text-sm text-neutral-60">{{ state.created_at }}</div>
                 </div>
             </div>
             <div class="py-2 px-6">
-                <Button class="border w-full">Cancel order</Button>
+                <Button class="border w-full hover:bg-neutral-10" @click="store.deleteOrder(order.id)">Cancelar orden</Button>
             </div>
             <hr >
             <div class="pt-3 pb-4 px-6">
                 <div class="py-2">
-                    <div class="text-base text-neutral-90">Shipping info</div>
+                    <div class="text-base text-neutral-90">Información de envío</div>
                 </div>
                 <div class="py-2">
-                    <div class="text-base text-neutral-60">Order Address</div>
-                    <div class="text-base text-neutral-90">3910 Crim Lane, Greendale County, Colorado. Zip Code 410348</div>
+                    <div class="text-base text-neutral-60">Dirección</div>
+                    <div class="text-base text-neutral-90">{{ order.client.address }}</div>
                 </div>
                 <div class="py-2">
-                    <div class="text-base text-neutral-60">Receives</div>
-                    <div class="text-base text-neutral-90">Ava Johnson</div>
+                    <div class="text-base text-neutral-60">Recive</div>
+                    <div class="text-base text-neutral-90">{{ order.client.name }}</div>
                 </div>
                 <div class="py-2">
-                    <div class="text-base text-neutral-60">Tracking ID</div>
-                    <div class="text-base text-neutral-90">0706502</div>
+                    <div class="text-base text-neutral-60">ID de Orden</div>
+                    <div class="text-base text-neutral-90">{{ parseId(order.id) }}</div>
                 </div>
             </div>
             <hr>
             <div class="flex gap-x-2 py-2.5 px-6">
-                <div class="flex-1 text-base text-neutral-90 font-semibold">Report a problem</div>
+                <div class="flex-1 text-base text-neutral-90 font-semibold">Reportar un problema</div>
                 <div>
                     <IconReportTriangle class="stroke-neutral-80"/>
                 </div>
             </div>
             <div class="flex gap-x-2 py-2.5 px-6">
-                <div class="flex-1 text-base text-neutral-90 font-semibold">Share order</div>
+                <div class="flex-1 text-base text-neutral-90 font-semibold">Compartir order</div>
                 <div>
                     <IconShare class="fill-neutral-80"/>
                 </div>
@@ -95,7 +87,34 @@
 </template>
 <script lang="ts" setup>
 import Button from '@/components/Button.vue';
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
+import { useOrderStore } from '../stores/inbox'
+import { storeToRefs } from "pinia";
 
+const store = useOrderStore()
 const router = useRouter()
+const route = useRoute()
+const { order } = storeToRefs(store)
+
+store.getOrder(route.params.id)
+
+const parseStates = (states) => {
+  if(states.length===0) return ''
+  const state = states[states.length - 1]
+  const state_names = {
+    'IN PREPARATION': 'en preparación'
+  }
+  return state_names[state.state]
+}
+
+const parseState = (state) => {
+  const state_names = {
+    'IN PREPARATION': 'en preparación'
+  }
+  return state_names[state.state]
+}
+
+const parseId = (id) => {
+  return id.toString().padStart(8,'0')
+}
 </script>

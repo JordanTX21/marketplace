@@ -144,7 +144,7 @@ export const usePaymentStore = defineStore('payment', () => {
     })
     const cards = ref<Card[]>([])
 
-    const saveCard = handleSubmit(async (card: Card) => {
+    const saveCard = handleSubmit(async (values) => {
         disabled.value = true
         const response = await request.post('card/', {
             name: name.value,
@@ -202,14 +202,14 @@ export const useOrderStore = defineStore('order', () => {
     const saveClient = (client: Client) => {
         order.value.client = client
     }
-    const saveCard = (card: Client) => {
+    const saveCard = (card: Card) => {
         order.value.card = card
     }
 
     const saveOrder = async (products: any, amount: any, quantity: any) => {
         disabled.value = true
         const response = await request.post('order/', {
-            client_id: order.value.client.id,
+            client_id: order.value.client!==null?order.value.client.id:0,
             user_id: user.id,
             products: products,
             amount: amount,

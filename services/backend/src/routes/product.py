@@ -13,8 +13,7 @@ from src.models.recomendation import recomendations
 from datetime import datetime
 from src.schemas.product import Product
 from src.schemas.product_search import ProductSearch
-from sqlalchemy import select
-import requests
+from typing import Optional
 import re
 import unicodedata
 import random
@@ -27,23 +26,30 @@ product = APIRouter(
     tags=["product"],
 )
 
-@product.get("/recomended")
-def recomended():
-    id=22
-    result = conn.execute(methadata.select().where(methadata.c.user_id==id and methadata.c.status==True)).fetchall()
-    methadatas = [dict(data._mapping)["type"] for data in result]
-    # text_search = 'I need Men casual t-shits'
-    text_search = 'I need '+' '.join(methadatas)
-    items = get_recommend_items(text_search, top_k=5)
-    i=0
-    for item in items:
-        i+=1
-        result = conn.execute(recomendations.insert().values({"user_id":id,"product_id":int(item["id"][4:]),"order":i,"created_at":datetime.now()}))
+@product.get("/recomended/cron")
+def cron():
+    result_user = conn.execute(users.select().where(users.c.status==True)).fetchall()
+    data = []
+    result = conn.execute(recomendations.delete())
     conn.commit()
-    return JSONResponse(content={"success": True, "message": "Lista de productos", "data": jsonable_encoder(items)})
+    for row in result_user:
+        user_dict = dict(row._mapping)
+        result = conn.execute(methadata.select().where(methadata.c.user_id==user_dict["id"] and methadata.c.status==True)).fetchall()
+        methadatas = [dict(data._mapping)["type"] for data in result]
+        if len(methadatas) == 0:
+            continue
+        # text_search = 'I need Men casual t-shits'
+        text_search = 'I need '+' '.join(methadatas)
+        items = get_recommend_items(text_search, top_k=5)
+        i=0
+        for item in items:
+            i+=1
+            result = conn.execute(recomendations.insert().values({"user_id":user_dict["id"],"product_id":int(item["id"][4:]),"order":i,"created_at":datetime.now()}))
+        conn.commit()
+    return JSONResponse(content={"success": True, "message": "Productos recomendados generados"})
 
-@product.get("/recomendations/{user_id}")
-def get_recomendations(user_id:int):
+@product.get("/recomended/")
+def recomended(user_id: Optional[int] = None):
     result_rec = conn.execute(recomendations.select().where(recomendations.c.user_id==user_id,recomendations.c.status==True)).fetchall()
     products_ids = [dict(data._mapping)["product_id"] for data in result_rec]
     result = conn.execute(products.select().where(products.c.id.in_(products_ids),products.c.status==True)).fetchall()

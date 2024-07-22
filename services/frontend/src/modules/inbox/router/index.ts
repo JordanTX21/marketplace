@@ -13,7 +13,7 @@ export default {
             component: () => import('../views/OrderReviewView.vue')
         },
         {
-            path: 'tracking',
+            path: 'tracking/:id',
             name: 'tracking',
             component: () => import('../views/TrackingView.vue')
         },

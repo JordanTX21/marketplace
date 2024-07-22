@@ -90,8 +90,8 @@ class CoreRecommendation:
             f.write('True')
 
     def recommended_products(self, text, top_k=2):
-        if not self.has_embbeddings():
-            self.save_redis_vectors()
+        # if not self.has_embbeddings():
+        self.save_redis_vectors()
         print("Initializing the search")
         query_vector = self.embedding_openai(text)
         response = self.r_client.search_similar_documents(query_vector, top_k)

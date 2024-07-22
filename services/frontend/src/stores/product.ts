@@ -2,8 +2,10 @@ import { ref } from 'vue'
 import { defineStore } from 'pinia'
 import Request from '@/utils/request';
 import { useLoginStore } from '@/modules/auth/stores/login'
+import UserSingleton from '@/stores/user';
 
 const request = new Request();
+const _userSingleton = UserSingleton.getInstance();
 
 interface User {
     name: string,
@@ -49,6 +51,7 @@ export const useProductStore = defineStore('product', () => {
     })
     const products = ref<Product[]>([])
     const searchs = ref<string[]>([])
+    const disabled = ref<boolean>(false)
     const reset = () => {
         product.value = {
             id: 0,
@@ -75,7 +78,20 @@ export const useProductStore = defineStore('product', () => {
     }
     const list = async () => {
         products.value = []
+        disabled.value = true
         const response = await request.get('product/')
+        disabled.value = false
+        if(!response.success){
+            return false;
+        }
+        products.value = response.data
+    }
+    const listRecomended = async () => {
+        const user = _userSingleton.getData()
+        products.value = []
+        disabled.value = true
+        const response = await request.get('product/recomended/',{user_id:user.id})
+        disabled.value = false
         if(!response.success){
             return false;
         }
@@ -97,5 +113,5 @@ export const useProductStore = defineStore('product', () => {
         products.value = response.data
     }
 
-    return { product, products, searchs, get, list, search }
+    return { product, products, searchs, disabled, get, list, listRecomended, search }
 })

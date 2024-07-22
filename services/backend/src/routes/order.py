@@ -7,6 +7,8 @@ from src.models.order import orders
 from src.models.order_state import order_states
 from src.models.product import products
 from src.models.order_detail import order_details
+from src.models.product_image import product_images
+from src.models.client import clients
 from datetime import datetime
 from src.schemas.order import Order
 from src.schemas.order_state import OrderState
@@ -21,7 +23,7 @@ order = APIRouter(
 
 @order.get("/")
 def index(user_id: Optional[int] = None):
-    result = conn.execute(orders.select().where(orders.c.user_id==user_id,orders.c.status==True)).fetchall()
+    result = conn.execute(orders.select().where(orders.c.user_id==user_id,orders.c.status==True).order_by(orders.c.created_at.desc())).fetchall()
     data = []
     for row in result:
         order_dict = dict(row._mapping)
@@ -45,6 +47,9 @@ def index(user_id: Optional[int] = None):
             product_dict["created_at"] = product_dict["created_at"].isoformat()
             if product_dict["updated_at"]:
                 product_dict["updated_at"] = product_dict["updated_at"].isoformat()
+            images = conn.execute(product_images.select().where(product_images.c.product_id==product_dict["id"] and product_images.c.status==True)).fetchall()
+            product_dict["images"] = [dict(img._mapping)["image"] for img in images]
+            product_dict["image"] = product_dict["images"][0]
             order_dict["products"].append(product_dict)
         data.append(order_dict)
     if len(data) == 0:
@@ -101,9 +106,32 @@ def show(id:str):
     order_dict["created_at"] = order_dict["created_at"].isoformat()
     if order_dict["updated_at"]:
         order_dict["updated_at"] = order_dict["updated_at"].isoformat()
-
+    result_client = conn.execute(clients.select().where(clients.c.id==order_dict["client_id"],clients.c.status==True)).first()
+    order_dict["client"] = dict(result_client._mapping)
+    order_dict["client"]["created_at"] = order_dict["client"]["created_at"].isoformat()
+    if order_dict["client"]["updated_at"]:
+        order_dict["client"]["updated_at"] = order_dict["client"]["updated_at"].isoformat()
     result_states = conn.execute(order_states.select().where(order_states.c.order_id==order_dict["id"],order_states.c.status==True)).fetchall()
-    order_dict["states"] = [dict(rstate._mapping)["name"] for rstate in result_states]
+    order_dict["states"] = []
+    for rstate in result_states:
+        state_dict = dict(rstate._mapping)
+        state_dict["created_at"] = state_dict["created_at"].isoformat()
+        if state_dict["updated_at"]:
+            state_dict["updated_at"] = state_dict["updated_at"].isoformat()
+        order_dict["states"].append(state_dict)
+    result_details = conn.execute(order_details.select().where(order_details.c.order_id==order_dict["id"],order_details.c.status==True)).fetchall()
+    products_ids = [ dict(detail._mapping)["product_id"] for detail in result_details]
+    result_products = conn.execute(products.select().where(products.c.status==True,products.c.id.in_(products_ids))).fetchall()
+    order_dict["products"] = []
+    for rproduct in result_products:
+        product_dict = dict(rproduct._mapping)
+        product_dict["created_at"] = product_dict["created_at"].isoformat()
+        if product_dict["updated_at"]:
+            product_dict["updated_at"] = product_dict["updated_at"].isoformat()
+        images = conn.execute(product_images.select().where(product_images.c.product_id==product_dict["id"] and product_images.c.status==True)).fetchall()
+        product_dict["images"] = [dict(img._mapping)["image"] for img in images]
+        product_dict["image"] = product_dict["images"][0]
+        order_dict["products"].append(product_dict)
     return JSONResponse(content={"success": True, "message": "Orden encontrado", "data": order_dict})
     
 @order.delete("/{id}")
